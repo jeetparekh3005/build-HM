@@ -18,7 +18,7 @@ jobs:
           java-version: '17'
           
       - name: Clone project
-        run: git clone https://github.com/vipin2069/Harmony-Music-main
+        run: git clone https://github.com/vipin2069/Harmony-Music-main Harmony-Music
 
       - name: Flutter doctor
         run: flutter doctor
