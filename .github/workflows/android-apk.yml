@@ -18,16 +18,15 @@ jobs:
           distribution: 'microsoft'
           java-version: '17'
 
-      - name: Create .ssh directory
-        run: |
-          mkdir $HOME\.ssh
-        shell: pwsh
-
       - name: Decode SSH Key
         run: |
-          echo ${{ secrets.ENCODED_SSH_PRIVATE_KEY }} | base64 -d > $HOME\.ssh\id_rsa
-          chmod 600 $HOME\.ssh\id_rsa
-          ssh-keyscan github.com >> $HOME\.ssh\known_hosts
+          $base64EncodedKey = "${{ secrets.ENCODED_SSH_PRIVATE_KEY }}"
+          $decodedKey = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($base64EncodedKey))
+          $sshDir = "$HOME\.ssh"
+          New-Item -ItemType Directory -Force -Path $sshDir
+          $decodedKey | Out-File -FilePath "$sshDir\id_rsa" -Encoding ascii
+          icacls "$sshDir\id_rsa" /inheritance:r /grant:r "$($env:USERNAME):(R,W)"
+          ssh-keyscan github.com | Out-File -FilePath "$sshDir\known_hosts" -Encoding ascii
         shell: pwsh
 
       - name: Clone project
